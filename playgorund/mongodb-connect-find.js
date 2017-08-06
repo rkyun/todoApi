@@ -9,7 +9,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp,', (err, db)=>{
   console.log('Connect to MongoDB Server');
 
 
-  db.collection('Todos').find({completed: false}).toArray().then((docs)=>{
+  db.collection('Todos').find({completed: true}).toArray().then((docs)=>{
       console.log('Todos', JSON.stringify(docs, undefined, 2));
   }, (err)=>{
     console.log(err);

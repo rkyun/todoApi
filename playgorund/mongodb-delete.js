@@ -8,13 +8,29 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp,', (err, db)=>{
   }
   console.log('Connect to MongoDB Server');
 
+  //
+  // db.collection('Todos').deleteMany({text: "Eat shit"},(err, result)=>{
+  //   if(err){
+  //     console.log("Something goes wrong");
+  //   }
+  //
+  //   console.log('Successly deleted', JSON.stringify(result, undefined, 2))
+  // })
 
-  db.collection('Todos').insertOne({text: "Eat shit", completed: false},(err, result)=>{
+  db.collection('Todos').deleteOne({text: "Eat shit"},(err, result)=>{
     if(err){
       console.log("Something goes wrong");
     }
 
-    console.log('Successly Added', JSON.stringify(result.ops, undefined, 2));
+    console.log('Successly deleted', JSON.stringify(result, undefined, 2))
+  })
+
+  db.collection('Todos').findOneAndDelete({completed: false},(err, result)=>{
+    if(err){
+      console.log("Something goes wrong");
+    }
+
+    console.log('Successly deleted', JSON.stringify(result, undefined, 2))
   })
 
 

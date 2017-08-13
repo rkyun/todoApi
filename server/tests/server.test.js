@@ -4,6 +4,7 @@ const {ObjectID} =  require('mongodb');
 
 const {app} = require ('./../server');
 const {Todo} = require('./../models/todo');
+const {User} = require('./../models/user');
 
 const {todos,users , populateTodos , populateUsers} = require('./seeds/seeds');
 
@@ -254,5 +255,56 @@ describe('POST /users', ()=>{
             .send({email: 'michal@gmail.com', password: '123456710'})
             .expect(400)
             .end(done);
+    })
+});
+
+
+describe('POST /users/login', ()=>{
+    it('should login user with valid credentials', (done)=>{
+        request(app)
+            .post('/users/login')
+            .send({email: users[1].email, password: users[1].password})
+            .expect(200)
+            .expect((res)=>{
+                expect(res.header['x-auth']).toExist();
+            })
+            .end((err, res)=>{
+                if(err){
+                    return done(err)
+                }
+
+                User.findById(users[1]._id).then((user)=>{
+                    expect(user.tokens[0]).toInclude({
+                        access: 'auth',
+                        token: res.header['x-auth']
+                    });
+                    done();
+                }).catch((e)=>{
+                    return done(e);
+                })
+            });
+    });
+
+    it('should not login user with invalid credentials', (done)=>{
+        request(app)
+            .post('/users/login')
+            .send({email: users[1].email, password: users[1].password+'1'})
+            .expect(400)
+            .expect((res)=>{
+                expect(res.header['x-auth']).toNotExist()
+            })
+            .end((err, res)=>{
+                if(err){
+                    return done(err);
+                }
+
+                User.findById(users[1]._id).then((user)=>{
+                    expect(user.tokens.length).toBe(0);
+                    done();
+                }).catch((e)=>{
+                    return done(e);
+                });
+            });
+        
     })
 });
